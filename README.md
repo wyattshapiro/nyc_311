@@ -102,9 +102,9 @@ I use Apache Airflow to orchestrate and schedule tasks.
 
 There are several main directories for Airflow:
 
-dags/: contains all DAGs (Directed Acyclic Graph)
-plugins/: contains all customizable code that can be leveraged by DAGs
-logs/: contains all log files that track code execution
+- dags/: contains all DAGs (Directed Acyclic Graph)
+- plugins/: contains all customizable code that can be leveraged by DAGs
+- logs/: contains all log files that track code execution
 See https://airflow.apache.org/ for more information.
 
 ## Usage
