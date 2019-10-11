@@ -120,3 +120,13 @@ See https://airflow.apache.org/ for more information.
 7. $ airflow scheduler
 8. Configure Airflow connections to AWS and Redshift cluster
 9. Turn on and Trigger DAG in Airflow UI
+
+## Future Growth Scenarios
+
+A description of how I would approach the problem differently under the following scenarios:
+- If the data was increased by 100x.
+  - ???
+- If the pipelines were run on a daily basis by 7am.
+  - ???
+- If the database needed to be accessed by 100+ people.
+  - ???
