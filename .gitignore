@@ -1,3 +1,11 @@
-venv/
+*.pyc
+*.zip
+*.DS_Store
+*.pid
+*.cfg
 *.csv
-.DS_Store
+*.json
+logs/
+venv/
+airflow.db
+airflow.cfg

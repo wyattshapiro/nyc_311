@@ -10,17 +10,23 @@ Note: This is built as the Capstone Project for Udacity's Data Engineering Nanod
 
 As a transplant into New York City, noise is one thing I expected to hear a lot. But, not everyone seems to handle it well, including my downstairs neighbor who comes knocking after every step. I wanted to take a look into what neighborhoods complain the most, about noise and otherwise.
 
-
 ### Solution
 
-In order to effectively gain insight from NYC 311 data, a data engineer needs to structure the data and load it into a database. The proposed plan consists of a Python ETL pipeline that will:
+In order to effectively gain insight from NYC 311 data, a data engineer needs to structure the data and load it into a database. The proposed plan consists of a Python ETL pipeline with two stages:
 
-- Extract each data file hosted on S3.
-- Load data into staging tables on Redshift.
-- Transform and load data into analytics tables with star schema on Redshift.
-- Perform data quality checks.
+- Stage 1: Extract raw data from API
+  - Query NYC Open Data 311 Endpoint
+  - Save JSON data in S3
+- Stage 2: Transform raw data into star schema for analytics
+  - Extract each data file hosted on S3.
+  - Load data into staging tables on Redshift.
+  - Transform and load data into analytics tables with star schema on Redshift.
+  - Perform data quality checks to ensure reliable data.
+- Stage 3: Perform analysis
+  - Use
 
 ![Alt text]()
+
 
 ## Data
 
@@ -107,19 +113,37 @@ There are several main directories for Airflow:
 - logs/: contains all log files that track code execution
 See https://airflow.apache.org/ for more information.
 
-## Usage
 
-**Steps to run**
+## Usage
 
 1. Navigate to top of project directory
 2. Create virtualenv (see Dependencies)
 3. Activate virtualenv (see Dependencies)
 4. Install requirements (see Dependencies)
-5. Start up Redshift cluster
-6. $ airflow webserver
-7. $ airflow scheduler
-8. Configure Airflow connections to AWS and Redshift cluster
-9. Turn on and Trigger DAG in Airflow UI
+
+### get_nyc_311_data_dag
+- ???
+
+**Steps to run get_nyc_311_data_dag**
+1. Set up Socrata App Token
+2. $ airflow webserver
+3. $ airflow scheduler
+4. Configure default AWS connection with your credentials through local file ~/.aws/credentials or Airflow UI
+5. In Airflow UI, create S3 connection
+6. Turn on and Trigger DAG in Airflow UI
+
+
+### load_nyc_311_data_dag
+- ??
+
+**Steps to run load_nyc_311_data_dag**
+1. Start up Redshift cluster
+2. $ airflow webserver
+3. $ airflow scheduler
+4. Configure default AWS connection with your credentials through local file ~/.aws/credentials or Airflow UI
+5. In Airflow UI, create Redshift cluster connection
+6. Turn on and Trigger DAG in Airflow UI
+
 
 ## Future Growth Scenarios
 
@@ -127,6 +151,9 @@ A description of how I would approach the problem differently under the followin
 - If the data was increased by 100x.
   - ???
 - If the pipelines were run on a daily basis by 7am.
+  - Launch a dedicated EC2 server that contained Airflow so it could guarantee that the DAGs ran every day.
+  - Set up a dedicated metadb and s3 bucket for airflow logging to ensure logs persist and can be viewed across multiple machines
   - ???
 - If the database needed to be accessed by 100+ people.
+  - Use Apache Superset to create a more user friendly way to analyze the data.
   - ???
