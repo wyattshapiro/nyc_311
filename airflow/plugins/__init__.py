@@ -15,6 +15,7 @@ class UdacityPlugin(AirflowPlugin):
         operators.DataQualityOperator,
         operators.CreateTableInRedshiftOperator,
         operators.QuerySocrataOperator,
+        operators.GetDarkSkyWeatherOperator,
         operators.SaveFileToS3Operator
     ]
     helpers = [

@@ -4,6 +4,7 @@ from operators.load_dimension import LoadDimensionOperator
 from operators.data_quality import DataQualityOperator
 from operators.create_table_in_redshift import CreateTableInRedshiftOperator
 from operators.query_socrata import QuerySocrataOperator
+from operators.get_darksky_weather import GetDarkSkyWeatherOperator
 from operators.save_file_to_s3 import SaveFileToS3Operator
 
 __all__ = [
@@ -13,5 +14,6 @@ __all__ = [
     'DataQualityOperator',
     'CreateTableInRedshiftOperator',
     'QuerySocrataOperator',
+    'GetDarkSkyWeatherOperator',
     'SaveFileToS3Operator'
 ]

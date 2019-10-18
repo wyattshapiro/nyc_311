@@ -1,9 +1,7 @@
-from datetime import datetime, timedelta
-import os
+from datetime import datetime
 import configparser
 from airflow import DAG
 from airflow.operators import (QuerySocrataOperator, SaveFileToS3Operator)
-from helpers import SqlQueries
 
 config = configparser.ConfigParser()
 config.read('nyc_311.cfg')
@@ -30,7 +28,7 @@ query_nyc_311_data = QuerySocrataOperator(
     provide_context=True,
     socrata_domain='data.cityofnewyork.us',
     socrata_dataset_identifier='fhrw-4uyv',
-    socrata_token=config['SOCRATA']['TOKEN_NYC_311_DATA_PIPELINE'],
+    socrata_token=config['SOCRATA']['API_TOKEN'],
     json_output_filepath='nyc_311_{ds}.json',
     socrata_query_filters={
                             'where': "resolution_action_updated_date between '{yesterday_ds}' and '{ds}'",
@@ -47,7 +45,7 @@ save_nyc_open_data_to_S3 = SaveFileToS3Operator(
     s3_bucket='nyc-311-data-us-east-2',
     s3_key='{execution_date.year}/{execution_date.month}/nyc_311_{ds}.json',
     local_filepath='nyc_311_{ds}.json',
-    replace=True,
+    replace=True
 )
 
 query_nyc_311_data >> save_nyc_open_data_to_S3

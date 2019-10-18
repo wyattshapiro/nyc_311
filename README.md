@@ -2,21 +2,24 @@
 
 ## Goal
 
-Create a an automated ETL pipeline to prepare  NYC 311 data for analysis.
+Create a an automated ETL pipeline to prepare NYC 311 data for analysis.
 
 Note: This is built as the Capstone Project for Udacity's Data Engineering Nanodegree.
 
 ### Problem
 
-As a transplant into New York City, noise is one thing I expected to hear a lot. But, not everyone seems to handle it well, including my downstairs neighbor who comes knocking after every step. I wanted to take a look into what neighborhoods complain the most, about noise and otherwise.
+As a transplant into New York City, noise is one thing I expected to hear a lot. But, not everyone seems to handle it well, including my downstairs neighbor who comes knocking after every step. I wanted to take a look into what blocks complain the most, about noise and otherwise. In addition, I wanted to explore weather as another dimension that could affect the type of complaints recieved (ex. if it's cold there could be an increase in 311 service requests for heating).
 
 ### Solution
 
 In order to effectively gain insight from NYC 311 data, a data engineer needs to structure the data and load it into a database. The proposed plan consists of a Python ETL pipeline with two stages:
 
-- Stage 1: Extract raw data from API
+- Stage 1a: Extract raw 311 data from API
   - Query NYC Open Data 311 Endpoint
   - Save JSON data in S3
+- Stage 1b: Extract raw weather data from API
+  - Query DarkSky Endpoint
+  - Save CSV data in S3
 - Stage 2: Transform raw data into star schema for analytics
   - Extract each data file hosted on S3.
   - Load data into staging tables on Redshift.
@@ -25,7 +28,7 @@ In order to effectively gain insight from NYC 311 data, a data engineer needs to
 - Stage 3: Perform analysis
   - Use
 
-![Alt text]()
+![Alt text](nyc_311_ERD.png?raw=true "NYC 311 ERD")
 
 
 ## Data
@@ -34,15 +37,17 @@ In order to effectively gain insight from NYC 311 data, a data engineer needs to
 
 - This dataset is a subset of real NYC 311 data from the City of New York.
 - Files live on S3 with the link ???
-- Each file is in JSON format and contains metadata about the 311 complaint.
-  - The files are partitioned by year, month, and day of each complaint.
-  - 311_complaints/{year}/{month}/{day}/{complaint_id}.json
+- Each file is in JSON format and contains data about the 311 complaint.
+  - The files are partitioned by year and month of each complaint.
+  - 311_complaints/{year}/{month}/{year}-{month}-{day}.json
 
-### Borough Block Lot (BBL) Dataset
+### Weather Dataset
 
-- This dataset is a mapping between Borough Block Lot (BBL) and neighborhood.
+- This dataset is an hourly temperature recording powered by DarkSky.
 - File lives on S3 with the link ???
-- File is in CSV format and contains a mapping from BBL to neighborhood.
+- File is in CSV format and contains data
+  - The files are partitioned by year, month, and day.
+  - temperature/{year}/{month}/{day}/{year}-{month}-{day}.csv
 
 
 ## Data Models
@@ -126,6 +131,18 @@ See https://airflow.apache.org/ for more information.
 
 **Steps to run get_nyc_311_data_dag**
 1. Set up Socrata App Token
+2. $ airflow webserver
+3. $ airflow scheduler
+4. Configure default AWS connection with your credentials through local file ~/.aws/credentials or Airflow UI
+5. In Airflow UI, create S3 connection
+6. Turn on and Trigger DAG in Airflow UI
+
+
+### get_nyc_weather_data_dag
+- ???
+
+**Steps to run get_nyc_weather_data_dag**
+1. Set up DarkSky App Token
 2. $ airflow webserver
 3. $ airflow scheduler
 4. Configure default AWS connection with your credentials through local file ~/.aws/credentials or Airflow UI

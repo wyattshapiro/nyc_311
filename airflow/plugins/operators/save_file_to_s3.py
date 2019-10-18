@@ -2,6 +2,7 @@ from airflow.hooks.S3_hook import S3Hook
 from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
 
+
 class SaveFileToS3Operator(BaseOperator):
 
     @apply_defaults
@@ -22,9 +23,8 @@ class SaveFileToS3Operator(BaseOperator):
         self.local_filepath = local_filepath
         self.replace = replace
 
-
     def execute(self, context):
-        self.log.info("Retrieving credentials")
+        self.log.info('Retrieving credentials')
         s3_hook = S3Hook(self.s3_conn_id)
 
         # render macros to variables
@@ -33,9 +33,9 @@ class SaveFileToS3Operator(BaseOperator):
         rendered_s3_bucket = self.s3_bucket.format(**context)
 
         # save file to S3
-        self.log.info("Saving local file to S3")
+        self.log.info('Saving local file to S3')
         s3_hook.load_file(filename=rendered_local_filepath,
                           bucket_name=rendered_s3_bucket,
                           key=rendered_s3_key,
                           replace=self.replace)
-        self.log.info("Saved local file {} to bucket {}, key {}".format(rendered_local_filepath, rendered_s3_bucket, rendered_s3_key))
+        self.log.info('Saved local file {} to bucket {}, key {}'.format(rendered_local_filepath, rendered_s3_bucket, rendered_s3_key))
