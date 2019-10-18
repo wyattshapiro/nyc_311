@@ -28,17 +28,17 @@ In order to effectively gain insight from NYC 311 data, a data engineer needs to
 - Stage 3: Perform analysis
   - Use
 
-![Alt text](nyc_311_ERD.png?raw=true "NYC 311 ERD")
+![Alt text]()
 
 
 ## Data
 
-### 311 Complaint Dataset
+### 311 Service Request Dataset
 
 - This dataset is a subset of real NYC 311 data from the City of New York.
 - Files live on S3 with the link ???
-- Each file is in JSON format and contains data about the 311 complaint.
-  - The files are partitioned by year and month of each complaint.
+- Each file is in JSON format and contains data about the 311 service request.
+  - The files are partitioned by year and month of each service request.
   - 311_complaints/{year}/{month}/{year}-{month}-{day}.json
 
 ### Weather Dataset
@@ -54,7 +54,7 @@ In order to effectively gain insight from NYC 311 data, a data engineer needs to
 
 ### Entities
 
-The database is structured as a star schema for analysis of complaints. As such, the fact table (ie center of the star) will be complaints, and it will have it's associated dimensions related as foreign keys.
+The database is structured as a star schema for analysis of 311 service requests. As such, the fact table (ie center of the star) will be complaints, and it will have it's associated dimensions related as foreign keys.
 
 Fact table
 - complaints: ???
@@ -64,7 +64,7 @@ Dimension tables
 
 ### Entity Relationship Diagram (ERD)
 
-![Alt text]()
+![Alt text](nyc_311_ERD.png?raw=true "NYC 311 ERD")
 
 
 ## Installation
