@@ -2,17 +2,16 @@
 
 ## Goal
 
-Create a an automated ETL pipeline to prepare NYC 311 data for analysis.
+Create an automated ETL pipeline to analyze noise complaints and other service requests in NYC.
 
-Note: This is built as the Capstone Project for Udacity's Data Engineering Nanodegree.
 
 ### Problem
 
-As a transplant into New York City, noise is one thing I expected to hear a lot. But, not everyone seems to handle it well, including my downstairs neighbor who comes knocking after every step. I wanted to take a look into what blocks complain the most, about noise and otherwise. In addition, I wanted to explore weather as another dimension that could affect the type of complaints recieved (ex. if it's cold there could be an increase in 311 service requests for heating).
+As a transplant into New York City, noise is one thing I expected to hear a lot. But, not everyone seems to handle it well, including my downstairs neighbor who comes knocking after every step. I wanted to take a look into what NYC blocks complain the most, about noise and otherwise. In addition, I wanted to explore weather as another dimension that could affect the type of complaints received (ex. if it's cold there could be an increase in 311 service requests for heating).
 
 ### Solution
 
-In order to effectively gain insight from NYC 311 data, a data engineer needs to structure the data and load it into a database. The proposed plan consists of a Python ETL pipeline with two stages:
+In order to effectively gain insight into Noise Complaints and other non-emergency service requests in NYC, I turned to NYC Open Data 311. I needed to structure the data and load it into a database for later analysis. The proposed plan consists of a Python ETL pipeline with two stages:
 
 - Stage 1a: Extract raw 311 data from API
   - Query NYC Open Data 311 Endpoint
@@ -36,18 +35,19 @@ In order to effectively gain insight from NYC 311 data, a data engineer needs to
 ### 311 Service Request Dataset
 
 - This dataset is a subset of real NYC 311 data from the City of New York.
-- Files live on S3 with the link ???
-- Each file is in JSON format and contains data about the 311 service request.
-  - The files are partitioned by year and month of each service request.
-  - 311_complaints/{year}/{month}/{year}-{month}-{day}.json
+  - 311 Service Requests are non-emergency requests to municipal services.
+- Files live on S3 with the link s3://nyc-311-data-us-east-2
+- Each file is in JSON format and contains data about 311 service requests for one day.
+  - The files are partitioned by year, month, and day.
+  - 311_complaints/{year}/{month}/nyc_311_{year}-{month}-{day}.json
 
 ### Weather Dataset
 
 - This dataset is an hourly temperature recording powered by DarkSky.
-- File lives on S3 with the link ???
-- File is in CSV format and contains data
+- File lives on S3 with the link s3://nyc-weather-data-us-east-2
+- Each file is in CSV format and contains hourly data about NYC temperature for one day.
   - The files are partitioned by year, month, and day.
-  - temperature/{year}/{month}/{day}/{year}-{month}-{day}.csv
+  - temperature/{year}/{month}/nyc_weather_{year}-{month}-{day}.csv
 
 
 ## Data Models
@@ -57,7 +57,7 @@ In order to effectively gain insight from NYC 311 data, a data engineer needs to
 The database is structured as a star schema for analysis of 311 service requests. As such, the fact table (ie center of the star) will be complaints, and it will have it's associated dimensions related as foreign keys.
 
 Fact table
-- complaints: ???
+- ServiceRequests: ???
 
 Dimension tables
 - ???
@@ -169,8 +169,8 @@ A description of how I would approach the problem differently under the followin
   - ???
 - If the pipelines were run on a daily basis by 7am.
   - Launch a dedicated EC2 server that contained Airflow so it could guarantee that the DAGs ran every day.
-  - Set up a dedicated metadb and s3 bucket for airflow logging to ensure logs persist and can be viewed across multiple machines
+  - Set up a dedicated metadb and s3 bucket for airflow logging to ensure logs persist and are viewable across multiple machines
   - ???
 - If the database needed to be accessed by 100+ people.
-  - Use Apache Superset to create a more user friendly way to analyze the data.
+  - For non technical users, I could use Apache Superset to create a more user friendly way to analyze the data.
   - ???

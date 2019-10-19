@@ -11,7 +11,8 @@ client = Socrata(NYC_OPEN_DATA_ENPOINT,
                  SOCRATA_APP_TOKEN)
 
 # First 2000 results, returned as JSON from API
-results = client.get(NYC_311_ENDPOINT, where='starts_with(complaint_type, "Noise")', limit=2000, exclude_system_fields=False)
+
+results = client.get(NYC_311_ENDPOINT, where="closed_date between '2019-10-13' and '2019-10-14'", limit=2000, exclude_system_fields=False)
 
 # write out as json
 with open('noise_complaints_311.json', 'w') as outfile:
