@@ -6,6 +6,8 @@ from operators.create_table_in_redshift import CreateTableInRedshiftOperator
 from operators.query_socrata import QuerySocrataOperator
 from operators.get_darksky_weather import GetDarkSkyWeatherOperator
 from operators.save_file_to_s3 import SaveFileToS3Operator
+from operators.save_directory_to_s3 import SaveDirectoryToS3Operator
+from operators.split_file_to_directory import SplitFileToDirectoryOperator
 
 __all__ = [
     'StageToRedshiftOperator',
@@ -15,5 +17,7 @@ __all__ = [
     'CreateTableInRedshiftOperator',
     'QuerySocrataOperator',
     'GetDarkSkyWeatherOperator',
-    'SaveFileToS3Operator'
+    'SaveFileToS3Operator',
+    'SaveDirectoryToS3Operator',
+    'SplitFileToDirectoryOperator'
 ]

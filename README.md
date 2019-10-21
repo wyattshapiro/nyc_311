@@ -11,7 +11,7 @@ As a transplant into New York City, noise is one thing I expected to hear a lot.
 
 ### Solution
 
-In order to effectively gain insight into Noise Complaints and other non-emergency service requests in NYC, I turned to NYC Open Data 311. I needed to structure the data and load it into a database for later analysis. The proposed plan consists of a Python ETL pipeline with two stages:
+In order to effectively gain insight into Noise Complaints and other non-emergency service requests in NYC, I turned to NYC Open Data 311. I needed to extract the data from APIs, structure it, and load it into a data warehouse for later analysis. The proposed plan consists of a Python ETL pipeline with the following stages:
 
 - Stage 1a: Extract raw 311 data from API
   - Query NYC Open Data 311 Endpoint
@@ -25,7 +25,7 @@ In order to effectively gain insight into Noise Complaints and other non-emergen
   - Transform and load data into analytics tables with star schema on Redshift.
   - Perform data quality checks to ensure reliable data.
 - Stage 3: Perform analysis
-  - Use
+  - ???
 
 ![Alt text]()
 
@@ -39,7 +39,9 @@ In order to effectively gain insight into Noise Complaints and other non-emergen
 - Files live on S3 with the link s3://nyc-311-data-us-east-2
 - Each file is in JSON format and contains data about 311 service requests for one day.
   - The files are partitioned by year, month, and day.
-  - 311_complaints/{year}/{month}/nyc_311_{year}-{month}-{day}.json
+  - {year}/{month}/{day}/{id}.json
+
+See https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9 for more information on data.
 
 ### Weather Dataset
 
@@ -47,7 +49,9 @@ In order to effectively gain insight into Noise Complaints and other non-emergen
 - File lives on S3 with the link s3://nyc-weather-data-us-east-2
 - Each file is in CSV format and contains hourly data about NYC temperature for one day.
   - The files are partitioned by year, month, and day.
-  - temperature/{year}/{month}/nyc_weather_{year}-{month}-{day}.csv
+  - {year}/{month}/nyc_weather_{year}-{month}-{day}.csv
+
+See https://darksky.net/dev/docs for more information on data.
 
 
 ## Data Models
@@ -127,33 +131,31 @@ See https://airflow.apache.org/ for more information.
 4. Install requirements (see Dependencies)
 
 ### get_nyc_311_data_dag
-- ???
+Extracts yesterday's closed NYC 311 service requests and saves to S3.
 
 **Steps to run get_nyc_311_data_dag**
-1. Set up Socrata App Token
+1. Set up Socrata App Token to request NYC 311 data
 2. $ airflow webserver
 3. $ airflow scheduler
 4. Configure default AWS connection with your credentials through local file ~/.aws/credentials or Airflow UI
 5. In Airflow UI, create S3 connection
 6. Turn on and Trigger DAG in Airflow UI
-
 
 ### get_nyc_weather_data_dag
-- ???
+Extracts yesterday's NYC weather from DarkSky and saves to S3.
 
 **Steps to run get_nyc_weather_data_dag**
-1. Set up DarkSky App Token
+1. Set up DarkSky App Token to request NYC weather data
 2. $ airflow webserver
 3. $ airflow scheduler
 4. Configure default AWS connection with your credentials through local file ~/.aws/credentials or Airflow UI
 5. In Airflow UI, create S3 connection
 6. Turn on and Trigger DAG in Airflow UI
 
+### prepare_311_data_for_analysis_dag
+Loads and transforms NYC 311 service requests and weather into star schema in Redshift for analysis.
 
-### load_nyc_311_data_dag
-- ??
-
-**Steps to run load_nyc_311_data_dag**
+**Steps to run prepare_311_data_for_analysis_dag**
 1. Start up Redshift cluster
 2. $ airflow webserver
 3. $ airflow scheduler
@@ -167,10 +169,13 @@ See https://airflow.apache.org/ for more information.
 A description of how I would approach the problem differently under the following scenarios:
 - If the data was increased by 100x.
   - ???
+
 - If the pipelines were run on a daily basis by 7am.
-  - Launch a dedicated EC2 server that contained Airflow so it could guarantee that the DAGs ran every day.
-  - Set up a dedicated metadb and s3 bucket for airflow logging to ensure logs persist and are viewable across multiple machines
-  - ???
+  - My first step would be to launch a dedicated AWS EC2 server that contained Airflow instead of using my local computer. This would ensure that the DAGs ran every day, because the EC2 server would be less likely to shut down than my local computer.
+  - Then, I would set up a dedicated metadb and s3 bucket for Airflow logging to ensure logs persist even after resetting the database. In addition, this would ensure logs are viewable across multiple machines so any engineer on the team could debug and monitor.
+  - I would also configure email alerts on failure, so that if a problem occurs a teammate or I could be notified quickly.
+  - Finally, I would add a Service Level Agreement to Airflow to make sure the data was prepared for the end users on an agreed upon schedule. This would help indicate if there were performance issues or if we needed to scale up the Airflow instance.
+
 - If the database needed to be accessed by 100+ people.
-  - For non technical users, I could use Apache Superset to create a more user friendly way to analyze the data.
   - ???
+  - For non technical users, I would connect an instance of Apache Superset to create a more user friendly way to analyze the data. This open source dashboard tool could be connected to Redshift and pre-programmed with relevant graphs to the end users.

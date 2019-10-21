@@ -24,9 +24,10 @@ print('-' * 10)
 forecast_hourly_data_object_list = forecast.hourly.data
 forecast_hourly_data_dict_list = []
 for forecast_hourly_data_object in forecast_hourly_data_object_list:
-    forecast_hourly_data_dict_list.append(vars(forecast_hourly_data_dict))
-rendered_csv_output_filepath = 'nyc_weather_data.csv'
+    forecast_hourly_data_dict_list.append(vars(forecast_hourly_data_object))
+rendered_csv_output_filepath = 'nyc_weather_hourly_data.csv'
 keys = forecast_hourly_data_dict_list[0].keys()
+print(keys)
 with open(rendered_csv_output_filepath, 'w') as outfile:
     dict_writer = csv.DictWriter(outfile, keys)
     dict_writer.writeheader()

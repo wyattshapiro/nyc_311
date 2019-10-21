@@ -1,7 +1,7 @@
 from datetime import datetime
 import configparser
 from airflow import DAG
-from airflow.operators import (QuerySocrataOperator, SaveFileToS3Operator)
+from airflow.operators import (QuerySocrataOperator, SplitFileToDirectoryOperator, SaveDirectoryToS3Operator)
 
 config = configparser.ConfigParser()
 config.read('nyc_311.cfg')
@@ -32,20 +32,29 @@ query_nyc_311_data = QuerySocrataOperator(
     json_output_filepath='nyc_311_{yesterday_ds}.json',
     socrata_query_filters={
                             'where': "closed_date between '{yesterday_ds}' and '{ds}'",
-                            'limit': 1000000,
-                            'exclude_system_fields': False
+                            'limit': 1000000
                            }
 )
 
-save_nyc_open_data_to_S3 = SaveFileToS3Operator(
+split_nyc_311_json = SplitFileToDirectoryOperator(
+    task_id='Split_nyc_311_json_data',
+    dag=dag,
+    provide_context=True,
+    json_input_filepath='nyc_311_{yesterday_ds}.json',
+    output_directory='nyc_311_{yesterday_ds}/',
+    json_output_filepath='{unique_id}.json'
+)
+
+save_nyc_open_data_to_S3 = SaveDirectoryToS3Operator(
     task_id='Save_nyc_open_data_to_S3',
     dag=dag,
     provide_context=True,
     s3_conn_id='s3',
     s3_bucket='nyc-311-data-us-east-2',
-    s3_key='{execution_date.year}/{execution_date.month}/nyc_311_{yesterday_ds}.json',
-    local_filepath='nyc_311_{yesterday_ds}.json',
+    s3_directory='{execution_date.year}/{execution_date.month}/{execution_date.day}/',
+    local_directory='nyc_311_{yesterday_ds}/',
     replace=True
 )
 
-query_nyc_311_data >> save_nyc_open_data_to_S3
+query_nyc_311_data >> split_nyc_311_json
+split_nyc_311_json >> save_nyc_open_data_to_S3
