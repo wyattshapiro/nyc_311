@@ -2,32 +2,56 @@
 
 ## Goal
 
-Create an automated ETL pipeline to analyze noise complaints and other service requests in NYC.
-
+Create an automated ETL pipeline to prepare data for analysis of noise complaints and other 311 service requests in NYC.
 
 ### Problem
 
-As a transplant into New York City, noise is one thing I expected to hear a lot. But, not everyone seems to handle it well, including my downstairs neighbor who comes knocking after every step. I wanted to take a look into what NYC blocks complain the most, about noise and otherwise. In addition, I wanted to explore weather as another dimension that could affect the type of complaints received (ex. if it's cold there could be an increase in 311 service requests for heating).
+The City of New York is responsible for the governance of millions of people. They offer a variety of different municipal services that must be managed to take care of streets, buildings, and the people. In order to better understand what services their constituents are using throughout the year, they want to explore the 311 service requests they have received. They are especially interested in how they can accommodate their diverse boroughs (Brooklyn, Bronx, Queens, Manhattan, Staten Island). In addition, they want to explore how weather conditions and seasonal differences affect the type of services received (ex. if it's cold there could be an increase in 311 service requests for no heating in building).
 
-### Solution
+### Solution: Technologies
 
-In order to effectively gain insight into Noise Complaints and other non-emergency service requests in NYC, I turned to NYC Open Data 311. I needed to extract the data from APIs, structure it, and load it into a data warehouse for later analysis. The proposed plan consists of a Python ETL pipeline with the following stages:
+I chose to develop the ETL pipeline in the cloud because it eliminates the need to invest in costly hardware upfront, allows rapid scale, and enables global access to the data. Amazon Web Services is a natural choice to develop as it is a leading cloud provider with a wide array of services. There are three main components in this pipeline.
 
-- Stage 1a: Extract raw 311 data from API
-  - Query NYC Open Data 311 Endpoint
-  - Save JSON data in S3
-- Stage 1b: Extract raw weather data from API
-  - Query DarkSky Endpoint
-  - Save CSV data in S3
+AWS S3 as the Data Lake
+- Object storage service that can store highly unstructured data in many formats
+- Used to store a high volume of incoming data
+- Highly available and durable against data system failures as it is automatically copied across multiple systems
+
+AWS Redshift as the Data Warehouse
+- Online analytical processing (OLAP) that supports analytical processes
+- Easy to access and query
+- Direct connection to S3 (no additional middleware needed to read/write data)
+
+Apache Airflow as the ETL orchestrator
+- Task scheduler for batch operations
+- Highly configurable Directed Acyclic Graphs
+- Integrates with S3 and Redshift to ensure tasks are scheduled and completed on a regular basis
+
+### Solution: ETL Pipelines
+
+In order to effectively gain insight into Noise Complaints and other non-emergency service requests in NYC, I turned to NYC Open Data 311. I needed to extract the data from APIs, store it in a data lake (S3), and transform/load it into a data warehouse (Redshift) with star schema for later analysis.
+
+The proposed plan consists of Python ETL pipelines with the following stages:
+
+- Stage 1a: Extract NYC 311 service request data
+  - Query NYC Open Data 311 API Endpoint daily
+  - Save JSON data to S3
+
+![Alt text](dag_get_nyc_311_data.png?raw=true "DAG Get NYC 311 data")
+
+- Stage 1b: Extract NYC weather data
+  - Query DarkSky API Endpoint daily
+  - Save CSV data to S3
+
+![Alt text](dag_get_nyc_weather_data.png?raw=true "DAG Get NYC weather data")
+
 - Stage 2: Transform raw data into star schema for analytics
   - Extract each data file hosted on S3.
   - Load data into staging tables on Redshift.
   - Transform and load data into analytics tables with star schema on Redshift.
   - Perform data quality checks to ensure reliable data.
-- Stage 3: Perform analysis
-  - ???
 
-![Alt text]()
+![Alt text](prepare_311_data_for_analysis.png?raw=true "DAG Prepare data for analysis")
 
 
 ## Data
@@ -45,7 +69,7 @@ See https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010
 
 ### Weather Dataset
 
-- This dataset is an hourly temperature recording powered by DarkSky.
+- This dataset is an hourly temperature measurements powered by DarkSky.
 - File lives on S3 with the link s3://nyc-weather-data-us-east-2
 - Each file is in CSV format and contains hourly data about NYC temperature for one day.
   - The files are partitioned by year, month, and day.
@@ -58,7 +82,7 @@ See https://darksky.net/dev/docs for more information on data.
 
 ### Entities
 
-The database is structured as a star schema for analysis of 311 service requests. As such, the fact table (ie center of the star) will be complaints, and it will have it's associated dimensions related as foreign keys.
+The database is structured as a star schema for analysis of 311 service requests. As such, the fact table (ie center of the star) will be service requests, and it will have it's associated dimensions related as foreign keys.
 
 Fact table
 - ServiceRequests: ???
@@ -164,11 +188,21 @@ Loads and transforms NYC 311 service requests and weather into star schema in Re
 6. Turn on and Trigger DAG in Airflow UI
 
 
+## Analysis
+
+I ran some sample queries on Redshift that could answer questions of interest to the City of New York.
+- What are the most popular complaints per Borough for 2019 (Year to Date)?
+- What borough has the most noise complaints for 2019 (Year to Date)?
+  -
+- What service requests are at the highest demand at different temperature ranges for 2019 (Year to Date)?
+  -
+
 ## Future Growth Scenarios
 
 A description of how I would approach the problem differently under the following scenarios:
 - If the data was increased by 100x.
-  - ???
+  - In order to process billions of rows of data, I could turn to computing on Spark. Spark is an open source distributed cluster-computing framework. Because I chose to use S3 as a Data Lake, I could seamlessly integrate Spark with my current cloud environment using AWS Elastic Map Reduce (EMR) to manage the nodes.
+  - Also, I could switch the "Prepare data for analysis" DAG to append new rows to the tables instead of resetting the tables on every run. This way I only have to process 311 and weather data from a short time period instead of all of it.
 
 - If the pipelines were run on a daily basis by 7am.
   - My first step would be to launch a dedicated AWS EC2 server that contained Airflow instead of using my local computer. This would ensure that the DAGs ran every day, because the EC2 server would be less likely to shut down than my local computer.
@@ -177,5 +211,7 @@ A description of how I would approach the problem differently under the followin
   - Finally, I would add a Service Level Agreement to Airflow to make sure the data was prepared for the end users on an agreed upon schedule. This would help indicate if there were performance issues or if we needed to scale up the Airflow instance.
 
 - If the database needed to be accessed by 100+ people.
-  - ???
-  - For non technical users, I would connect an instance of Apache Superset to create a more user friendly way to analyze the data. This open source dashboard tool could be connected to Redshift and pre-programmed with relevant graphs to the end users.
+  - If there are many users that need to access the database, I would want to optimize the most common queries running against Redshift. One way to do this is to specify sort_keys for these common queries, where each table's sort key would act like an index. This would result in query filters scanning data more efficiently.
+  - I could also change the distribution style on the Redshift nodes to accommodate JOIN heavy queries. If the dimension tables are small enough they should be broadcast to all nodes, as this makes JOINs more efficient since they don't need to traverse nodes to find the necessary data.
+  - For short running queries, I could turn to enabling short query acceleration (SQA) which would allow shorter queries to run ahead of those that take a long time. This way results are delivered more quickly to users.
+  - Also, for non technical users, I could connect an instance of Apache Superset to create a more user friendly way to analyze the data. This open source dashboard tool could be connected to Redshift and pre-programmed with relevant graphs to the end users. This could be especially helpful to create reusable dashboards for c-suite execs, managers, etc.
