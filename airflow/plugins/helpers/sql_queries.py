@@ -228,7 +228,7 @@ class SqlQueries:
         FROM staging_service_request
     """)
 
-    # Example Anlysis Queries
+    # Example Analysis Queries
     query_complaints_per_borough = ("""
         SELECT COUNT(SR.service_request_id) as complaint_count, CT.complaint_type, L.borough
         FROM service_request SR
