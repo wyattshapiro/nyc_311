@@ -51,7 +51,7 @@ The proposed plan consists of Python ETL pipelines with the following stages:
   - Transform and load data into analytics tables with star schema on Redshift.
   - Perform data quality checks to ensure reliable data.
 
-![Alt text](prepare_311_data_for_analysis.png?raw=true "DAG Prepare data for analysis")
+![Alt text](dag_prepare_311_data_for_analysis.png?raw=true "DAG Prepare data for analysis")
 
 
 ## Data
