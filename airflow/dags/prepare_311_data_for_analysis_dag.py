@@ -28,43 +28,43 @@ start_operator = DummyOperator(
     dag=dag
 )
 
-# create_staging_service_request_table = CreateTableInRedshiftOperator(
-#     task_id='Create_staging_service_request_table_in_redshift',
-#     dag=dag,
-#     redshift_conn_id="redshift",
-#     sql_drop = SqlQueries.staging_service_request_table_drop,
-#     sql_create = SqlQueries.staging_service_request_table_create
-# )
-#
-# create_staging_weather_table = CreateTableInRedshiftOperator(
-#     task_id='Create_staging_weather_table_in_redshift',
-#     dag=dag,
-#     redshift_conn_id="redshift",
-#     sql_drop = SqlQueries.staging_weather_table_drop,
-#     sql_create = SqlQueries.staging_weather_table_create
-# )
-#
-# stage_service_request_to_redshift = StageToRedshiftOperator(
-#     task_id='Stage_service_request_from_s3_to_redshift',
-#     dag=dag,
-#     redshift_conn_id="redshift",
-#     aws_credentials_id="aws_credentials",
-#     s3_path="s3://nyc-311-data-us-east-2",
-#     redshift_target_table = "staging_service_request",
-#     redshift_aws_region = "us-east-2",
-#     s3_file_type="json"
-# )
-#
-# stage_weather_to_redshift = StageToRedshiftOperator(
-#     task_id='Stage_weather_from_s3_to_redshift',
-#     dag=dag,
-#     redshift_conn_id="redshift",
-#     aws_credentials_id="aws_credentials",
-#     s3_path="s3://nyc-weather-data-us-east-2",
-#     redshift_target_table = "staging_weather",
-#     redshift_aws_region = "us-east-2",
-#     s3_file_type="csv"
-# )
+create_staging_service_request_table = CreateTableInRedshiftOperator(
+    task_id='Create_staging_service_request_table_in_redshift',
+    dag=dag,
+    redshift_conn_id="redshift",
+    sql_drop = SqlQueries.staging_service_request_table_drop,
+    sql_create = SqlQueries.staging_service_request_table_create
+)
+
+create_staging_weather_table = CreateTableInRedshiftOperator(
+    task_id='Create_staging_weather_table_in_redshift',
+    dag=dag,
+    redshift_conn_id="redshift",
+    sql_drop = SqlQueries.staging_weather_table_drop,
+    sql_create = SqlQueries.staging_weather_table_create
+)
+
+stage_service_request_to_redshift = StageToRedshiftOperator(
+    task_id='Stage_service_request_from_s3_to_redshift',
+    dag=dag,
+    redshift_conn_id="redshift",
+    aws_credentials_id="aws_credentials",
+    s3_path="s3://nyc-311-data-us-east-2/2019/01/01/",
+    redshift_target_table = "staging_service_request",
+    redshift_aws_region = "us-east-2",
+    s3_file_type="json"
+)
+
+stage_weather_to_redshift = StageToRedshiftOperator(
+    task_id='Stage_weather_from_s3_to_redshift',
+    dag=dag,
+    redshift_conn_id="redshift",
+    aws_credentials_id="aws_credentials",
+    s3_path="s3://nyc-weather-data-us-east-2",
+    redshift_target_table = "staging_weather",
+    redshift_aws_region = "us-east-2",
+    s3_file_type="csv"
+)
 
 create_weather_table = CreateTableInRedshiftOperator(
     task_id='Create_weather_table_in_redshift',
@@ -182,31 +182,70 @@ load_service_request_table = LoadFactOperator(
     fact_table="service_request"
 )
 
-# check_time_table = DataQualityOperator(
-#     task_id='Check_time_table',
-#     dag=dag,
-#     redshift_conn_id="redshift",
-#     table="time"
-# )
+check_weather_table = DataQualityOperator(
+    task_id='Check_weather_table',
+    dag=dag,
+    redshift_conn_id="redshift",
+    table="weather"
+)
+
+check_location_table = DataQualityOperator(
+    task_id='Check_location_table',
+    dag=dag,
+    redshift_conn_id="redshift",
+    table="location"
+)
+
+check_complaint_type_table = DataQualityOperator(
+    task_id='Check_complaint_type_table',
+    dag=dag,
+    redshift_conn_id="redshift",
+    table="complaint_type"
+)
+
+check_agency_table = DataQualityOperator(
+    task_id='Check_agency_table',
+    dag=dag,
+    redshift_conn_id="redshift",
+    table="agency"
+)
+
+check_submission_type_table = DataQualityOperator(
+    task_id='Check_submission_type_table',
+    dag=dag,
+    redshift_conn_id="redshift",
+    table="submission_type"
+)
+
+check_status_table = DataQualityOperator(
+    task_id='Check_status_table',
+    dag=dag,
+    redshift_conn_id="redshift",
+    table="status"
+)
 
 end_operator = DummyOperator(
     task_id='Stop_execution',
     dag=dag
 )
 
-# start_operator >> [create_staging_service_request_table, create_staging_weather_table]
-# create_staging_service_request_table >> stage_service_request_to_redshift
-# create_staging_weather_table >> stage_weather_to_redshift
-# [stage_service_request_to_redshift, stage_weather_to_redshift] >> create_service_request_table
-#
-
-start_operator >> [create_weather_table, create_location_table, create_complaint_type_table, create_agency_table, create_submission_type_table, create_status_table]
-[create_weather_table, create_location_table, create_complaint_type_table, create_agency_table, create_submission_type_table, create_status_table] >> load_weather_table
-[create_weather_table, create_location_table, create_complaint_type_table, create_agency_table, create_submission_type_table, create_status_table] >> load_location_table
-[create_weather_table, create_location_table, create_complaint_type_table, create_agency_table, create_submission_type_table, create_status_table] >> load_complaint_type_table
-[create_weather_table, create_location_table, create_complaint_type_table, create_agency_table, create_submission_type_table, create_status_table] >> load_agency_table
-[create_weather_table, create_location_table, create_complaint_type_table, create_agency_table, create_submission_type_table, create_status_table] >> load_submission_type_table
-[create_weather_table, create_location_table, create_complaint_type_table, create_agency_table, create_submission_type_table, create_status_table] >> load_status_table
-[load_weather_table, load_location_table, load_complaint_type_table, load_agency_table, load_submission_type_table, load_status_table] >> create_service_request_table
+start_operator >> [create_staging_service_request_table, create_staging_weather_table]
+create_staging_service_request_table >> stage_service_request_to_redshift
+create_staging_weather_table >> stage_weather_to_redshift
+stage_service_request_to_redshift >> [create_weather_table, create_location_table, create_complaint_type_table, create_agency_table, create_submission_type_table, create_status_table]
+stage_weather_to_redshift >> [create_weather_table, create_location_table, create_complaint_type_table, create_agency_table, create_submission_type_table, create_status_table]
+create_weather_table >> load_weather_table
+create_location_table >> load_location_table
+create_complaint_type_table >> load_complaint_type_table
+create_agency_table >> load_agency_table
+create_submission_type_table >> load_submission_type_table
+create_status_table >> load_status_table
+load_weather_table >> check_weather_table
+load_location_table >> check_location_table
+load_complaint_type_table >> check_complaint_type_table
+load_agency_table >> check_agency_table
+load_submission_type_table >> check_submission_type_table
+load_status_table >> check_status_table
+[check_weather_table, check_location_table, check_complaint_type_table, check_agency_table, check_submission_type_table, check_status_table] >> create_service_request_table
 create_service_request_table >> load_service_request_table
 load_service_request_table >> end_operator

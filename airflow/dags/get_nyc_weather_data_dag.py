@@ -9,7 +9,7 @@ config.read('nyc_311.cfg')
 default_args = {
     'owner': 'wyatt',
     'depends_on_past': False,
-    'start_date': datetime(2019, 10, 15),
+    'start_date': datetime(2019, 1, 1),
     'email_on_failure': False,
     'retries': 0
 }

@@ -25,6 +25,8 @@ class CreateTableInRedshiftOperator(BaseOperator):
 
         self.log.info("Dropping table in Redshift")
         redshift.run(self.sql_drop)
+        self.log.info("Successfully dropped table in Redshift")
 
         self.log.info("Creating table in Redshift")
         redshift.run(self.sql_create)
+        self.log.info("Successfully created table in Redshift")

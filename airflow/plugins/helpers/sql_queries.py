@@ -19,27 +19,27 @@ class SqlQueries:
                                  agency varchar(256),
                                  agency_name varchar(256),
                                  complaint_type varchar(256),
-                                 descriptor varchar(20000),
-                                 incident_zip varchar(5),
+                                 descriptor varchar(256),
+                                 incident_zip varchar(10),
                                  incident_address varchar(256),
                                  street_name varchar(256),
                                  address_type varchar(256),
                                  city varchar(256),
                                  facility_type varchar(256),
                                  status varchar(256),
-                                 resolution_description varchar(20000),
+                                 resolution_description varchar(1024),
                                  resolution_action_updated_date varchar(256),
                                  community_board varchar(256),
                                  bbl varchar(256),
                                  borough varchar(256),
-                                 x_coordinate_state_plane numeric(18,0),
-                                 y_coordinate_state_plane numeric(18,0),
+                                 x_coordinate_state_plane int4,
+                                 y_coordinate_state_plane int4,
                                  open_data_channel_type varchar(256),
                                  park_facility_name varchar(256),
                                  park_borough varchar(256),
-                                 latitude numeric(18,0),
-                                 longitude numeric(18,0),
-                                 location varchar(20000),
+                                 latitude float8,
+                                 longitude float8,
+                                 location varchar(256),
                                  location_address varchar(256),
                                  location_city varchar(256),
                                  location_state varchar(256),
@@ -56,7 +56,7 @@ class SqlQueries:
     staging_weather_table_create = ("""
     CREATE TABLE IF NOT EXISTS public.staging_weather (
                                  time varchar(256),
-                                 summary varchar(20000),
+                                 summary varchar(256),
                                  icon varchar(256),
                                  precip_intensity float4,
                                  precip_probability float4,
@@ -87,7 +87,7 @@ class SqlQueries:
                                  bbl_id varchar(10),
                                  status_id varchar(256),
                                  submission_type_id varchar(256),
-                                 resolution_description varchar(20000),
+                                 resolution_description varchar(1024),
                                  resolution_action_updated_date timestamp,
                                  CONSTRAINT service_request_pkey PRIMARY KEY (service_request_id)
                     );
@@ -96,11 +96,11 @@ class SqlQueries:
     weather_table_create = ("""
     CREATE TABLE IF NOT EXISTS public.weather (
                                       date_hour_id varchar(256) NOT NULL,
-                                      datetime timestamp,
-                                      hour int,
+                                      datetime timestamp NOT NULL,
+                                      hour int NOT NULL,
                                       temperature float4 NOT NULL,
                                       apparent_temperature float4,
-                                      summary varchar(20000),
+                                      summary varchar(256),
                                       humidity float4,
                                       precip_intensity float4,
                                       precip_probability float4,
@@ -117,9 +117,9 @@ class SqlQueries:
                                 lot varchar(4),
                                 incident_address varchar(256),
                                 city varchar(256),
-                                incident_zip varchar(5),
-                                latitude numeric(18,0),
-                                longitude numeric(18,0),
+                                incident_zip varchar(10),
+                                latitude float8,
+                                longitude float8,
                                 CONSTRAINT location_pkey PRIMARY KEY (bbl_id)
                 );
     """)
@@ -128,7 +128,7 @@ class SqlQueries:
         CREATE TABLE IF NOT EXISTS public.complaint_type (
                                        complaint_type_id INTEGER IDENTITY(0,1),
                                        complaint_type varchar(256),
-                                       descriptor varchar(20000),
+                                       descriptor varchar(256),
                                        CONSTRAINT complaint_type_pkey PRIMARY KEY (complaint_type_id)
                                    );
     """)
@@ -136,7 +136,7 @@ class SqlQueries:
     agency_table_create = ("""
         CREATE TABLE IF NOT EXISTS public.agency (
                                        agency_id INTEGER IDENTITY(0,1),
-                                       agency_acronym varchar(256),
+                                       agency_acronym varchar(10),
                                        agency_name varchar(256),
                                        CONSTRAINT agency_pkey PRIMARY KEY (agency_id)
                                    );

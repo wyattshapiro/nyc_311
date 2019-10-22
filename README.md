@@ -85,10 +85,17 @@ See https://darksky.net/dev/docs for more information on data.
 The database is structured as a star schema for analysis of 311 service requests. As such, the fact table (ie center of the star) will be service requests, and it will have it's associated dimensions related as foreign keys.
 
 Fact table
-- ServiceRequests: ???
+- Service Requests: A 311 service request for NYC's non emergency services.
 
 Dimension tables
-- ???
+- Location: Place where service was requested
+- Weather: Weather conditions (temp, precipitation) for NYC in one hour.
+- Complaint Type: Type of service requested.
+- Agency: Agency that service request was sent to.
+- Submission Type: How the service was requested (phone, online, etc).
+- Status: Current standing of the request (assigned, closed, etc).
+
+See more information in data dictionary, data_dictionary_nyc_311.xlsx
 
 ### Entity Relationship Diagram (ERD)
 
