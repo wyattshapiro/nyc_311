@@ -195,14 +195,15 @@ Loads and transforms NYC 311 service requests and weather into star schema in Re
 6. Turn on and Trigger DAG in Airflow UI
 
 
-## Analysis
+## Future Analysis
 
-I ran some sample queries on Redshift that could answer questions of interest to the City of New York.
+Potential questions of interest to the City of New York:
+
 - What are the most popular complaints per Borough for 2019 (Year to Date)?
 - What borough has the most noise complaints for 2019 (Year to Date)?
-  -
 - What service requests are at the highest demand at different temperature ranges for 2019 (Year to Date)?
-  -
+
+Sample queries to answer these questions can be found in airflow/plugins/helpers/sql_queries.py
 
 ## Future Growth Scenarios
 

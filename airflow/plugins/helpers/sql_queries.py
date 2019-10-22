@@ -227,3 +227,34 @@ class SqlQueries:
         SELECT DISTINCT status
         FROM staging_service_request
     """)
+
+    # Example Anlysis Queries
+    query_complaints_per_borough = ("""
+        SELECT COUNT(SR.service_request_id) as complaint_count, CT.complaint_type, L.borough
+        FROM service_request SR
+        JOIN complaint_type CT ON (SR.complaint_type_id = CT.complaint_type_id)
+        JOIN location L ON (SR.bbl_id = L.bbl_id)
+        WHERE SR.bbl_id IS NOT NULL
+        GROUP BY CT.complaint_type, L.borough
+        ORDER BY complaint_count DESC;
+    """)
+
+    query_complaints_by_hot_temp = ("""
+        SELECT COUNT(SR.service_request_id) as complaint_count, CT.complaint_type
+        FROM service_request SR
+        JOIN complaint_type CT ON (SR.complaint_type_id = CT.complaint_type_id)
+        JOIN weather W ON (SR.created_date_hour_id = W.date_hour_id)
+        WHERE W.temperature < 32
+        GROUP BY CT.complaint_type
+        ORDER BY complaint_count DESC;
+    """)
+
+    query_complaints_by_cold_temp = ("""
+        SELECT COUNT(SR.service_request_id) as complaint_count, CT.complaint_type
+        FROM service_request SR
+        JOIN complaint_type CT ON (SR.complaint_type_id = CT.complaint_type_id)
+        JOIN weather W ON (SR.created_date_hour_id = W.date_hour_id)
+        WHERE W.temperature > 80
+        GROUP BY CT.complaint_type
+        ORDER BY complaint_count DESC;
+    """)
