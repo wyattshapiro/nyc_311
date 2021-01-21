@@ -8,9 +8,9 @@ Create an automated ETL pipeline to prepare data for analysis of noise complaint
 
 The City of New York is responsible for the governance of millions of people. They offer a variety of different municipal services that must be managed to take care of streets, buildings, and the people. In order to better understand what services their constituents are using throughout the year, they want to explore the 311 service requests they have received. They are especially interested in how they can accommodate their diverse boroughs (Brooklyn, Bronx, Queens, Manhattan, Staten Island). In addition, they want to explore how weather conditions and seasonal differences affect the type of services received (ex. if it's cold there could be an increase in 311 service requests for no heating in building).
 
-### Solution: Technologies
+### Technologies
 
-I chose to develop the ETL pipeline in the cloud because it eliminates the need to invest in costly hardware upfront, allows rapid scale, and enables global access to the data. Amazon Web Services is a natural choice to develop as it is a leading cloud provider with a wide array of services. There are three main components in this pipeline.
+Amazon Web Services is a natural choice to develop as it is a leading cloud provider with a wide array of services. There are three main components in this pipeline.
 
 AWS S3 as the Data Lake
 - Object storage service that can store highly unstructured data in many formats
@@ -27,7 +27,7 @@ Apache Airflow as the ETL orchestrator
 - Highly configurable Directed Acyclic Graphs
 - Integrates with S3 and Redshift to ensure tasks are scheduled and completed on a regular basis
 
-### Solution: ETL Pipelines
+### ETL Pipelines
 
 In order to effectively gain insight into Noise Complaints and other non-emergency service requests in NYC, I turned to NYC Open Data 311. I needed to extract the data from APIs, store it in a data lake (S3), and transform/load it into a data warehouse (Redshift) with star schema for later analysis.
 
@@ -213,10 +213,10 @@ A description of how I would approach the problem differently under the followin
   - Also, I could switch the "Prepare data for analysis" DAG to append new rows to the tables instead of resetting the tables on every run. This way I only have to process 311 and weather data from a short time period instead of all of it.
 
 - If the pipelines were run on a daily basis by 7am.
-  - My first step would be to launch a dedicated AWS EC2 server that contained Airflow instead of using my local computer. This would ensure that the DAGs ran every day, because the EC2 server would be less likely to shut down than my local computer.
-  - Then, I would set up a dedicated metadb and s3 bucket for Airflow logging to ensure logs persist even after resetting the database. In addition, this would ensure logs are viewable across multiple machines so any engineer on the team could debug and monitor.
-  - I would also configure email alerts on failure, so that if a problem occurs a teammate or I could be notified quickly.
-  - Finally, I would add a Service Level Agreement to Airflow to make sure the data was prepared for the end users on an agreed upon schedule. This would help indicate if there were performance issues or if we needed to scale up the Airflow instance.
+  - Launch a dedicated AWS EC2 server that contained Airflow.
+  - Set up a dedicated metadb and s3 bucket for Airflow logging to ensure logs persist even after resetting the database.
+  - Configure email alerts on failure, so that if a problem occurs a teammate or I could be notified quickly.
+  - Add a Service Level Agreement to Airflow to make sure the data was prepared for the end users on an agreed upon schedule. This would help indicate if there were performance issues or if we needed to scale up the Airflow instance.
 
 - If the database needed to be accessed by 100+ people.
   - If there are many users that need to access the database, I would want to optimize the most common queries running against Redshift. One way to do this is to specify sort_keys for these common queries, where each table's sort key would act like an index. This would result in query filters scanning data more efficiently.
